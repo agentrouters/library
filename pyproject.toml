@@ -1,10 +1,20 @@
 [project]
 name = "agent-routers"
-version = "0.1.0"
-description = "Priority-based async/sync routing engine for multi-agent systems"
+version = "0.2.0"
+description = "Async routing library with pluggable routing strategies for multi-agent systems"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [ ]
+classifiers = [
+"Programming Language :: Python :: 3",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
+"License :: OSI Approved :: MIT License",
+"Operating System :: OS Independent",
+"Framework :: AsyncIO",
+"Topic :: Software Development :: Libraries"
+]
 
 
 [project.license]
@@ -17,7 +27,7 @@ name = "Michael Douglas Barbosa Araujo"
 
 [project.urls]
 Homepage = "https://agentrouters.github.io/docs/"
-Issues = "https://github.com/seuusuario/agent-routers/issues"
+Issues = "https://github.com/agentrouters/library/issues"
 
 
 [build-system]

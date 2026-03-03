@@ -1,21 +1,27 @@
 import inspect
-from typing import List, Any
+from typing import List, Any, Optional
 
 from .models import Rule
 from .exceptions import (
     NoAgentMatchedError,
     AgentAlreadyRegisteredError,
 )
+from .engines.deterministic import DeterministicEngine
+from .engines.base import BaseRoutingEngine
 
 
 class AgentRouter:
     """
-    Async-first agent router with priority-based matching.
+    Async-first agent router with pluggable routing engines.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        engine: Optional[BaseRoutingEngine] = None
+    ) -> None:
         self._rules: List[Rule] = []
         self._registered_names = set()
+        self._engine = engine or DeterministicEngine()
 
     def register(
         self,
@@ -37,18 +43,19 @@ class AgentRouter:
 
         self._rules.append(rule)
         self._registered_names.add(name)
-
-        # Sort once when registering (descending priority)
         self._rules.sort(reverse=True)
 
     async def route(self, input_text: str) -> Any:
 
-        for rule in self._rules:
-            if rule.compiled_pattern.search(input_text):
+        matched_rule = await self._engine.match(
+            input_text,
+            self._rules
+        )
 
-                if inspect.iscoroutinefunction(rule.handler):
-                    return await rule.handler(input_text)
+        if not matched_rule:
+            raise NoAgentMatchedError(input_text)
 
-                return rule.handler(input_text)
+        if inspect.iscoroutinefunction(matched_rule.handler):
+            return await matched_rule.handler(input_text)
 
-        raise NoAgentMatchedError(input_text)
+        return matched_rule.handler(input_text)
